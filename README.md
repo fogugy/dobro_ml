@@ -33,3 +33,6 @@ bash runml.sh
 
 /project_type - post метод для определения класса проекта. Возвращает json 
 {"type": "personal"/"common"}
+
+/msg_score - post метод для определения вероятности неприятного сообщения. Возвращает json 
+{"score": float[0-1]}
