@@ -1,12 +1,10 @@
 import pickle
 import re
-
-import keras
 import numpy as np
 import pandas as pd
-from html.parser import HTMLParser
 from nltk.corpus import stopwords
 from pymystem3 import Mystem
+from html.parser import HTMLParser
 
 html_parser = HTMLParser()
 import gensim.downloader as api
@@ -129,27 +127,23 @@ example_v = w2v.get_vector(default_word)
 
 
 class MsgClassifier:
-    model_path = './msg_classifier.h5'
-    columns_path = './msg_columns.pickle'
-    hash_vec_path = './msg_hash_vec.pickle'
-    normalizer_path = './msg_normalizer.pickle'
+    model_path = 'msg_classifier.pickle'
+    columns_path = 'msg_columns.pickle'
+    hash_vec_path = 'msg_hash_vec.pickle'
 
     _model = None
     _columns = []
     _hash_vec = None
-    _normalizer = None
 
     def __init__(self):
         self.init()
 
     def init(self):
-        self._model = keras.models.load_model(self.model_path)
+        with open(self.model_path, 'rb') as f:
+            self._model = pickle.load(f)
 
         with open(self.columns_path, 'rb') as f:
             self._columns = pickle.load(f)
-
-        with open(self.normalizer_path, 'rb') as f:
-            self._normalizer = pickle.load(f)
 
         with open(self.hash_vec_path, 'rb') as f:
             self._hash_vec = pickle.load(f)
@@ -163,11 +157,11 @@ class MsgClassifier:
 
         v = get_vec(text, _min).tolist() + get_vec(text, _max).tolist() + get_vec(text, _avg).tolist()
 
-        # hash features
+        # hashing features
         h = self._hash_vec.transform([text]).toarray().flatten().tolist()
+
+        f = v + h
 
         df.loc[0] = v + h
 
-        v = self._normalizer.transform(df)
-
-        return self._model.predict(v)[0][0]
+        return self._model.predict_proba(df)[0]

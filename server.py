@@ -23,7 +23,7 @@ def normal_form_post(text):
 @request_map("/msg_score", method="POST")
 def normal_form_post(text):
     r = msg_classifier.predict(text)
-    return 200, json.dumps({'score': str(r)})
+    return 200, json.dumps({'score': str(r[1])})
 
 
 @request_map("/test", method="GET")
