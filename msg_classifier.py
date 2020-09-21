@@ -1,17 +1,22 @@
 import pickle
 import re
+
 import numpy as np
 import pandas as pd
+from html.parser import HTMLParser
 from nltk.corpus import stopwords
 from pymystem3 import Mystem
-from html.parser import HTMLParser
 
 html_parser = HTMLParser()
-import gensim.downloader as api
 
-w2v = api.load("word2vec-ruscorpora-300")
 m = Mystem()
 stop_rus = stopwords.words('russian')
+
+with open('./w2vec.pickle', 'rb') as f:
+    w2v = pickle.load(f)
+
+with open('./d_associated.pickle', 'rb') as f:
+    d_associated = pickle.load(f)
 
 emoticon_dict = {
     ")": "радость",
@@ -123,6 +128,17 @@ def get_feat(text, aggr):
     return vec
 
 
+def has_abscent(text):
+    _min = 1
+    for word in text:
+        tagged = tag(word)
+        if tagged in d_associated:
+            return 1
+        if tagged in w2v.vocab:
+            _min = min(_min, w2v.distances(tagged, d_associated).min())
+    return int(_min <= 0.5)
+
+
 example_v = w2v.get_vector(default_word)
 
 
@@ -150,6 +166,10 @@ class MsgClassifier:
 
     def predict(self, text):
         text = prepare(text)
+
+        if has_abscent(text.split(' ')):
+            return [0, 1]
+
         df = pd.DataFrame(columns=self._columns)
 
         # part of speech features
@@ -159,8 +179,6 @@ class MsgClassifier:
 
         # hashing features
         h = self._hash_vec.transform([text]).toarray().flatten().tolist()
-
-        f = v + h
 
         df.loc[0] = v + h
 
