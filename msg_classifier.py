@@ -7,13 +7,14 @@ from html.parser import HTMLParser
 from nltk.corpus import stopwords
 from pymystem3 import Mystem
 
+import gensim.downloader as api
+
 html_parser = HTMLParser()
 
 m = Mystem()
 stop_rus = stopwords.words('russian')
 
-with open('./w2vec.pickle', 'rb') as f:
-    w2v = pickle.load(f)
+w2v = api.load("word2vec-ruscorpora-300")
 
 with open('./d_associated.pickle', 'rb') as f:
     d_associated = pickle.load(f)
