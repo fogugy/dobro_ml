@@ -47,11 +47,10 @@ git clone https://github.com/fogugy/dobro_ml.git
 ```
 
 ### 5. Дать права докеру на шаринг файлов проекта
-settings/ resources/ file sharing
+settings -> resources -> file sharing (добавить директорию с проектом)  
+Актуально для Windows
 
-### 6. Перейти в директорию с проектом
-
-### 7. Запустить оттуда 
+### 6. Перейти в директорию с проектом, запустить
 ```
 bash runml.sh
 ```
